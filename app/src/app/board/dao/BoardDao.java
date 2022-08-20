@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import com.google.gson.Gson;
 import app.board.domain.Board;
 
 
@@ -23,20 +24,29 @@ public class BoardDao {
 
   public void load() throws Exception {
     try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
+
+      // 파일에서 JSON 문자열을 모두 읽어 StringBuilder에 담는다.
+      StringBuilder strBuilder = new StringBuilder();
       String str;
       while ((str = in.readLine()) != null) {
-        Board board = Board.create(str);
-        list.add(board);
-        boardNo = board.no;
+        strBuilder.append(str);
+      }
+
+      // StringBuilder에 보관된 JSON 문자열을 가지고 Board[]를 생성한다.
+      Board[] arr = new Gson().fromJson(strBuilder.toString(), Board[].class);
+
+      // Board[] 배열의 저장된 객체를 List로 옮긴다.
+      for (int i = 0; i < arr.length; i++) {
+        list.add(arr[i]);
       }
     }
   }
 
   public void save() throws Exception {
     try (FileWriter out = new FileWriter(filename)) {
-      for (Board board : list) {
-        out.write(board.toCsv() + "\n");
-      }
+      Board[] boards = list.toArray(new Board[0]); // 질문! 왜 [0] 인지? // list에서 Board 배열을 리턴받고 list에 들어있는 만큼만 뽑아서 boards에 저장
+      out.write( new Gson().toJson(boards)); // 배열을 주면서 Json 문자열로 만든다.
+      // 인스턴스 변수가 현재 다루는 Json 정보를 저장하기 때문에 각각 다른 gson 객체를 만들어야 함
     }
   }
 

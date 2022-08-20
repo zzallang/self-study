@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import com.google.gson.Gson;
 import app.board.domain.Member;
 
 // 회원 목록을 관리하는 역할
@@ -22,19 +23,25 @@ public class MemberDao{
 
   public void load() throws Exception {
     try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
+      StringBuilder strBuilder = new StringBuilder();
       String str;
+
       while ((str = in.readLine()) != null) {
-        Member member = Member.create(str);
-        list.add(member);
+        strBuilder.append(str);
+      }
+
+      Member[] arr = new Gson().fromJson(strBuilder.toString(), Member[].class);
+
+      for (int i = 0; i < arr.length; i++) {
+        list.add(arr[i]);
       }
     }
   }
 
   public void save() throws Exception {
     try (FileWriter out = new FileWriter(filename)) {
-      for (Member member : list) {
-        out.write(member.toCsv() + "\n");
-      }
+      Member[] members = list.toArray(new Member[0]);
+      out.write( new Gson().toJson(members)); 
     }
   }
 

@@ -22,12 +22,12 @@ public class App {
 
       // 핸들러를 담을 레퍼런스 배열을 준비한다.
       Handler[] handlers = new Handler[] {
-          new BoardHandler("board.csv"),
-          new BoardHandler("reading.csv"),
-          new BoardHandler("visit.csv"),
-          new BoardHandler("notice.csv"),
-          new BoardHandler("diary.csv"),
-          new MemberHandler("member.csv"),
+          new BoardHandler("board.json"),
+          new BoardHandler("reading.json"),
+          new BoardHandler("visit.json"),
+          new BoardHandler("notice.json"),
+          new BoardHandler("diary.json"),
+          new MemberHandler("member.json"),
       };
 
       // "메인" 메뉴의 이름을 스택에 등록한다.
