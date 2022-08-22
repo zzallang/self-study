@@ -8,4 +8,6 @@
  */
 
 rootProject.name = 'self-study'
-include('app')
+// include('app')
+include('app-client')
+include('app-server')
