@@ -17,13 +17,13 @@ public class BoardServlet implements Servlet {
   private String filename;
 
   public BoardServlet(String dataName) {
-    filename = dataName + ".josn";
+    filename = dataName + ".json";
     boardDao = new BoardDao(filename);
 
     try {
       boardDao.load();
     } catch (Exception e) {
-      System.out.printf("%s 파일 로딩 중 오류 발생! \n", filename);
+      System.out.printf("%s 파일 로딩 중 오류 발생!\n", filename);
       e.printStackTrace();
     }
   }
@@ -40,14 +40,14 @@ public class BoardServlet implements Servlet {
       switch (command) {
         case "findAll":
           Board[] boards = boardDao.findAll();
-          out.writeUTF(SUCESSS);
+          out.writeUTF(SUCCESS);
           out.writeUTF(new Gson().toJson(boards));
           break;
         case "findByNo":
           no = in.readInt();
           board = boardDao.findByNo(no);
           if (board != null) {
-            out.writeUTF(SUCESSS);
+            out.writeUTF(SUCCESS);
             out.writeUTF(new Gson().toJson(board));
           } else {
             out.writeUTF(FAIL);
@@ -56,16 +56,16 @@ public class BoardServlet implements Servlet {
         case "insert":
           json = in.readUTF();
           board = new Gson().fromJson(json, Board.class);
-          boardDao.save();
           boardDao.insert(board);
-          out.writeUTF(SUCESSS);
+          boardDao.save();
+          out.writeUTF(SUCCESS);
           break;
         case "update":
           json = in.readUTF();
           board = new Gson().fromJson(json, Board.class);
           if (boardDao.update(board)) {
             boardDao.save();
-            out.writeUTF(SUCESSS);
+            out.writeUTF(SUCCESS);
           } else {
             out.writeUTF(FAIL);
           }
@@ -73,7 +73,7 @@ public class BoardServlet implements Servlet {
           no = in.readInt();
           if (boardDao.delete(no)) {
             boardDao.save();
-            out.writeUTF(SUCESSS);
+            out.writeUTF(SUCCESS);
           } else {
             out.writeUTF(FAIL); 
           }

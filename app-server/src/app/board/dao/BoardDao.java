@@ -32,20 +32,23 @@ public class BoardDao {
         strBuilder.append(str);
       }
 
-      // StringBuilder에 보관된 JSON 문자열을 가지고 Board[]를 생성한다.
+      // StringBuilder에 보관된 JSON 문자열을 가지고 Board[] 을 생성한다. 
       Board[] arr = new Gson().fromJson(strBuilder.toString(), Board[].class);
 
-      // Board[] 배열의 저장된 객체를 List로 옮긴다.
+      // Board[] 배열의 저장된 객체를 List 로 옮긴다.
       for (int i = 0; i < arr.length; i++) {
         list.add(arr[i]);
       }
+
+      // 게시글 데이터를 로딩한 후 마지막 게시글 번호를 설정해 둔다.
+      boardNo = arr[arr.length - 1].no;
     }
   }
 
   public void save() throws Exception {
     try (FileWriter out = new FileWriter(filename)) {
-      Board[] boards = list.toArray(new Board[0]); // 질문! 왜 [0] 인지? // list에서 Board 배열을 리턴받고 list에 들어있는 만큼만 뽑아서 boards에 저장
-      out.write( new Gson().toJson(boards)); // 배열을 주면서 Json 문자열로 만든다.
+      Board[] boards = list.toArray(new Board[0]); // list에서 Board 배열을 리턴받고 list에 들어있는 만큼만 뽑아서 boards에 저장
+      out.write(new Gson().toJson(boards)); // 배열을 주면서 Json 문자열로 만든다.
       // 인스턴스 변수가 현재 다루는 Json 정보를 저장하기 때문에 각각 다른 gson 객체를 만들어야 함
     }
   }
@@ -105,17 +108,3 @@ public class BoardDao {
     return ++boardNo;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Stack;
 import app.Handler.Handler;
 import app.board.handler.BoardHandler;
+import app.board.handler.MemberHandler;
 import app.util.Prompt;
 
 public class ClientApp {
@@ -33,8 +34,8 @@ public class ClientApp {
           new BoardHandler("reading", in, out),
           new BoardHandler("visit", in, out),
           new BoardHandler("notice", in, out),
-          new BoardHandler("diary", in, out)
-          //          new MemberHandler("member", in, out),
+          new BoardHandler("diary", in, out),
+          new MemberHandler("member", in, out)
       };
 
       // "메인" 메뉴의 이름을 스택에 등록한다.
