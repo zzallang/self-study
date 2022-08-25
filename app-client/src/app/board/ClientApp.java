@@ -3,6 +3,7 @@ package app.board;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Stack;
 import app.Handler.Handler;
 import app.board.handler.BoardHandler;
@@ -18,8 +19,6 @@ public class ClientApp {
     System.out.println("[게시글 관리 클라이언트]");
 
     try (
-        // 네트워크 준비
-        // => 정상적으로 연결 되었으면 Socket 객체를 리턴
         Socket socket = new Socket("127.0.0.1",8888);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         DataInputStream in = new DataInputStream(socket.getInputStream())) {
@@ -28,15 +27,14 @@ public class ClientApp {
 
       welcome();
 
-      // 핸들러를 담을 레퍼런스 배열을 준비한다.
-      Handler[] handlers = new Handler[] {
-          new BoardHandler("board", in, out),
-          new BoardHandler("reading", in, out),
-          new BoardHandler("visit", in, out),
-          new BoardHandler("notice", in, out),
-          new BoardHandler("diary", in, out),
-          new MemberHandler("member", in, out)
-      };
+      // 핸들러를 담을 컬렉션을 준비한다.
+      ArrayList<Handler> handlers = new ArrayList<>();
+      handlers.add(new BoardHandler("board", in, out));
+      handlers.add(new BoardHandler("reading", in, out));
+      handlers.add(new BoardHandler("visit", in, out));
+      handlers.add(new BoardHandler("notice", in, out));
+      handlers.add(new BoardHandler("diary", in, out));
+      handlers.add(new MemberHandler("member", in, out));
 
       // "메인" 메뉴의 이름을 스택에 등록한다.
       breadcrumbMenu.push("메인");
@@ -51,7 +49,8 @@ public class ClientApp {
         System.out.println();
 
         try {
-          int mainMenuNo = Prompt.inputInt("메뉴를 선택하세요[1..6](0: 종료) ");
+          int mainMenuNo = Prompt.inputInt(String.format(
+              "메뉴를 선택하세요[1..%d](0: 종료) ", handlers.size()));
           System.out.println();
 
           if (mainMenuNo < 0 || mainMenuNo > menus.length) {
@@ -66,7 +65,7 @@ public class ClientApp {
           breadcrumbMenu.push(menus[mainMenuNo - 1]);
 
           // 메뉴 번호로 Handler 레퍼런스에 들어있는 객체를 찾아 실행한다.
-          handlers[mainMenuNo - 1].execute();
+          handlers.get(mainMenuNo - 1).execute();
 
           breadcrumbMenu.pop();
 

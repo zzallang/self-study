@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Hashtable;
+import app.Servlet.Servlet;
 import app.board.servlet.BoardServlet;
 import app.board.servlet.MemberServlet;
 
@@ -13,63 +15,44 @@ public class ServerApp {
     System.out.println("[게시글 데이터 관리 서버]");
 
     try (
-        // 네트워크 준비
-        // =>클라이언트 연결을 관리할 객체 준비
         ServerSocket serverSocket = new ServerSocket(8888)) {
 
       System.out.println("서버 소켓 준비 완료!");
 
-      try (
-          // 클라이언트의 연결을 기다림
-          // => 클라이언트와 연결되면 해당 클라이언트와 통신할 준비를 한다.
-          //    즉. Socket 객체 리턴
-          // => 클라이언트와 연결될 떄까지 리턴하지 않는다.
-          Socket socket = serverSocket.accept();
+      while (true) {
+        try (
+            Socket socket = serverSocket.accept();
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
 
-          // 클라이언트와 데이터를 주고 받는다.
-          // => 클라이언트가 보낸 데이터를 읽을 때 사용할 도구를 준비한다.
-          // => 데이터를 읽을 때 primitive type or String type의 값을
-          // 보다 쉽게 읽을 수 있도록 기존 입력 도구에 보조 도구(decorator)를 붙여 사용한다.
-          DataInputStream in = new DataInputStream(socket.getInputStream());
+          System.out.println("클라이언트 연결 완료");
 
-          // => 클라이언트로 데이터를 보낼 때 사용할 도구를 준비한다.
-          // => 데이터를 출력할 때 primitive type or String type의 값을
-          // 보다 쉽게 출력할 수 있도록 기존 입력 도구에 보조 도구(decorator)를 붙여 사용한다.
-          DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+          // 클라이언트 요청을 처리할 객체 준비
+          Hashtable<String,Servlet> servletMap = new Hashtable<>();
+          servletMap.put("board", new BoardServlet("board"));
+          servletMap.put("reading", new BoardServlet("reading"));
+          servletMap.put("visit", new BoardServlet("visit"));
+          servletMap.put("notice", new BoardServlet("notice"));
+          servletMap.put("diary", new BoardServlet("diary"));
+          servletMap.put("member", new MemberServlet("member"));
 
-        System.out.println("클라이언트 연결 완료");
+          while (true) {
+            // 클라이언트와 서버 사이에 정해진 규칙(protocol)에 따라 데이터를 주고 받는다.
+            String dataName = in.readUTF();
 
-        // 클라이언트 요청을 처리할 객체 준비
-        BoardServlet boardServlet = new BoardServlet("board");
-        BoardServlet readingServlet = new BoardServlet("reading");
-        BoardServlet visitServlet = new BoardServlet("visit");
-        BoardServlet noticeServlet = new BoardServlet("notice");
-        BoardServlet diaryServlet = new BoardServlet("diary");
-        MemberServlet memberServlet = new MemberServlet("member");
+            if (dataName.equals("exit")) {
+              break;
+            }
 
-        while (true) {
-          // 클라이언트와 서버 사이에 정해진 규칙(protocol)에 따라 데이터를 주고 받는다.
-          String dataName = in.readUTF();
-
-          if (dataName.equals("exit")) {
-            break;
+            Servlet servlet = servletMap.get(dataName);
+            if (servlet != null) {
+              servlet.service(in, out);
+            } else {
+              out.writeUTF("fail");
+            }
           }
-
-          switch (dataName) {
-            case "board": boardServlet.service(in, out); break;
-            case "reading": readingServlet.service(in, out); break;
-            case "visit": visitServlet.service(in, out); break;
-            case "notice": noticeServlet.service(in, out); break;
-            case "diary": diaryServlet.service(in, out); break;
-            case "member": memberServlet.service(in, out); break;
-            default : out.writeUTF("fail");
-          }
+          System.out.println("클라이언트 연결 종료");
         }
-
-        System.out.println("클라이언트 연결 종료");
-
-        // 네트워크 종료
-        // => 더 이상 클라이언트와 연결하고 싶지 않다면 네트워크 종료
       } // 안 쪽 try 
     } catch (Exception e) {
       e.printStackTrace();
