@@ -19,6 +19,15 @@ public class ServerApp {
 
       System.out.println("서버 소켓 준비 완료!");
 
+      // 클라이언트 요청을 처리할 객체 준비
+      Hashtable<String,Servlet> servletMap = new Hashtable<>();
+      servletMap.put("board", new BoardServlet("board"));
+      servletMap.put("reading", new BoardServlet("reading"));
+      servletMap.put("visit", new BoardServlet("visit"));
+      servletMap.put("notice", new BoardServlet("notice"));
+      servletMap.put("diary", new BoardServlet("diary"));
+      servletMap.put("member", new MemberServlet("member"));
+
       while (true) {
         try (
             Socket socket = serverSocket.accept();
@@ -27,21 +36,12 @@ public class ServerApp {
 
           System.out.println("클라이언트 연결 완료");
 
-          // 클라이언트 요청을 처리할 객체 준비
-          Hashtable<String,Servlet> servletMap = new Hashtable<>();
-          servletMap.put("board", new BoardServlet("board"));
-          servletMap.put("reading", new BoardServlet("reading"));
-          servletMap.put("visit", new BoardServlet("visit"));
-          servletMap.put("notice", new BoardServlet("notice"));
-          servletMap.put("diary", new BoardServlet("diary"));
-          servletMap.put("member", new MemberServlet("member"));
-
           while (true) {
             // 클라이언트와 서버 사이에 정해진 규칙(protocol)에 따라 데이터를 주고 받는다.
             String dataName = in.readUTF();
 
             if (dataName.equals("exit")) {
-              break;
+              break; 
             }
 
             Servlet servlet = servletMap.get(dataName);
@@ -52,8 +52,8 @@ public class ServerApp {
             }
           }
           System.out.println("클라이언트 연결 종료");
-        }
-      } // 안 쪽 try 
+        } // 안 쪽 try 
+      }
     } catch (Exception e) {
       e.printStackTrace();
     } // 바깥 쪽 try
