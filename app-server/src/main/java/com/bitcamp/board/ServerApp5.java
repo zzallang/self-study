@@ -9,7 +9,7 @@ import com.bitcamp.board.servlet.BoardServlet;
 import com.bitcamp.board.servlet.MemberServlet;
 import com.bitcamp.servlet.Servlet;
 
-public class ServerApp {
+public class ServerApp5 {
 
   public static void main(String[] args) {
     // 클라이언트 요청을 처리할 객체 준비
