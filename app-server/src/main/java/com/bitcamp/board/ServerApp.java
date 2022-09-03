@@ -21,11 +21,12 @@ public class ServerApp {
     servletMap.put("daily", new BoardServlet("daily"));
     servletMap.put("member", new MemberServlet("member"));
 
-    class RequestThread extends Thread{
+    // 스레드로 만드는 대신에 Thread가 실행할 수 있는 클래스로 변경한다.
+    class RequestRunnable implements Runnable {
 
       private Socket socket;
 
-      public RequestThread(Socket socket) {
+      public RequestRunnable(Socket socket) {
         this.socket = socket;
       }
 
@@ -69,10 +70,8 @@ public class ServerApp {
         Socket socket = serverSocket.accept();
 
         // 클라이언트 요청을 처리할 스레드를 만든다.
-        RequestThread t = new RequestThread(socket);
-
-        //main 실행 흐름에서 분리하여 별도의 실행 흐름으로 작업을 수행시킨다.
-        t.start();
+        // main 실행 흐름에서 분리하여 별도의 실행 흐름으로 작업을 수행시킨다.
+        new Thread(new RequestRunnable(socket)).start();
       }
 
     } catch (Exception e) {
