@@ -38,9 +38,6 @@ public class ServerApp {
 
             String dataName = in.readUTF();
 
-            // 로컬 클래스는 바깥 메소드의 로컬 변수를 자신의 멤버인 것 처럼 사용할 수 있다.
-            // 어떻게? 내부의 컴파일러가 그것이 가능하도록 필드와 생성자에 파라미터를 자도응로 추가한다.
-            // 
             Servlet servlet = servletMap.get(dataName);
             if (servlet != null) {
               servlet.service(in, out);
